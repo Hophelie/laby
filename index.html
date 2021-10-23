@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>laby</title>
+</head>
+<body>
+    <div id="container">
+    </div>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+        }
+        #container{
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .row{
+            display: flex;
+            flex-direction: row;
+        }
+        .case{
+            background-color: white;
+            min-height: 25px;
+            min-width: 25px;
+            display: flex;
+            border: 1px solid black;
+        }
+    </style>
+    <script src="script.js"></script>
+</body>
+</html>
