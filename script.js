@@ -1,8 +1,7 @@
 const container = document.querySelector('#container');
 
-const width = 40
+const width = 50
 const height = 25
-const speed = 100
 const personnage1 = {
     coord: {
         x: 0,
@@ -28,10 +27,12 @@ function generateMap(){
             let rowEnCours = document.querySelector(`#row-${i}`);
             rowEnCours.insertAdjacentHTML('beforeend', `<td id="case-${i}-${j}" class="case bt br bb bl"></td>`)
 
+            const cell = document.getElementById(`case-${i}-${j}`)
             let newCase = {
                 x: j,
                 y: i,
-                isVisited: false
+                isVisited: false,
+                element: cell
             }
             grid.push(newCase)
         }
@@ -51,28 +52,28 @@ function updatePosition(event){
 
    switch (event.key){
         case 'ArrowUp':
-            move(personnage1, 'haut')
+            moveInLab(personnage1, 'haut')
             break 
         case 'ArrowDown':
-            move(personnage1, 'bas')
+            moveInLab(personnage1, 'bas')
             break
         case 'ArrowRight':
-            move(personnage1, 'droite')
+            moveInLab(personnage1, 'droite')
             break 
         case 'ArrowLeft':
-            move(personnage1, 'gauche')
+            moveInLab(personnage1, 'gauche')
             break
         case 'z':
-            move(personnage2, 'haut')
+            moveInLab(personnage2, 'haut')
             break 
         case 's':
-            move(personnage2, 'bas')
+            moveInLab(personnage2, 'bas')
             break
         case 'd':
-            move(personnage2, 'droite')
+            moveInLab(personnage2, 'droite')
             break 
         case 'q':
-            move(personnage2, 'gauche')
+            moveInLab(personnage2, 'gauche')
             break
         default:
             console.log('vous appuyez sur une mauvaise touche');
@@ -131,38 +132,66 @@ function move(personnage,direction){
     const lastCoord = JSON.parse(JSON.stringify(personnage.coord))
     switch (direction){
         case 'haut':
-            clear(lastCoord);
+            
             personnage.coord.y > 0 ? personnage.coord.y-- : ''
-            spawn(personnage)
             break
         case 'bas':
-            clear(lastCoord);
             personnage.coord.y < height - 1 ? personnage.coord.y++ : ''
-            spawn(personnage)
             break
         case 'droite':
-            clear(lastCoord);
             personnage.coord.x < width - 1 ? personnage.coord.x++ : ''
-            spawn(personnage)
             break
         case 'gauche':
-            clear(lastCoord);
             personnage.coord.x > 0 ? personnage.coord.x-- : ''
-            spawn(personnage)
             break
     }
+    clear(lastCoord);
+    spawn(personnage)
 
     personnage.historique.pop()
+}
+
+function moveInLab(personnage,direction){
+
+    const lastCoord = JSON.parse(JSON.stringify(personnage.coord))
+    
+    const currentCase = document.querySelector(`#case-${lastCoord.y}-${lastCoord.x}`)
+
+    switch (direction){
+        case 'haut':
+            if(!currentCase.classList.contains('bt')){
+                personnage.coord.y > 0 ? personnage.coord.y-- : ''
+            }
+            break
+        case 'bas':
+            if(!currentCase.classList.contains('bb')){
+            personnage.coord.y < height - 1 ? personnage.coord.y++ : ''
+            }
+            break
+        case 'droite':
+            if(!currentCase.classList.contains('br')){
+            personnage.coord.x < width - 1 ? personnage.coord.x++ : ''
+            }
+            break
+        case 'gauche':
+            if(!currentCase.classList.contains('bl')){
+            personnage.coord.x > 0 ? personnage.coord.x-- : ''
+            }
+            break
+    }
+    clear(lastCoord);
+    spawn(personnage)
+
 }
 
 function clear(lastCoord){
     const {x: lastX, y: lastY} = lastCoord;
     
     lastCase = document.querySelector(`#case-${lastY}-${lastX}`)
-    lastCase.style.backgroundColor == 'yellow' ? lastCase.style.backgroundColor = 'white': '';
+    lastCase.style.backgroundColor == 'yellow' || 'blue' || 'red' ? lastCase.style.backgroundColor = 'white': '';
 }
 
-let Generator = {
+const Generator = {
     coord: {
         x: 0,
         y: 0
@@ -177,22 +206,30 @@ const createLaby = () => {
     cellToCheck = grid.find(cell => cell.x == Generator.coord.x && cell.y == Generator.coord.y)
     cellToCheck.isVisited = true
 
+    // firstCell = findNextCell(Generator.coord)
+    // moveAndDestroy(Generator,firstCell.direction)
+    //     while (Generator.coord.x !== 0 || Generator.coord.y !==0) {
+    //         nextCell = findNextCell(Generator.coord)
+    //         if(nextCell){
+    //             moveAndDestroy(Generator,nextCell.direction)
+    //         }else{
+    //             lastDirection = Generator.historique[Generator.historique.length - 1].direction
+    //             reverseDirection = reverse(lastDirection)
+    //             move(Generator,reverseDirection)
+    //         }
+            
+    //     }
 
-        
-        setInterval(() => {
-            nextCell = findNextCell(Generator.coord)
+    setInterval(function(){
+        nextCell = findNextCell(Generator.coord)
             if(nextCell){
                 moveAndDestroy(Generator,nextCell.direction)
-                console.log(Generator.historique)
             }else{
-                // ECRIRE LA FONCTION QUI PERMET DE REVENIR EN ARRIERE A PARTIR DE L'HISTORIQUE 
-                // goBack(Generator)
                 lastDirection = Generator.historique[Generator.historique.length - 1].direction
                 reverseDirection = reverse(lastDirection)
                 move(Generator,reverseDirection)
-                console.log(Generator.historique)          
             }
-        },1000/speed)
+    },1)
             
         
 
@@ -279,9 +316,9 @@ const reverse = direction => {
 document.addEventListener('DOMContentLoaded', () => {
 
     generateMap();
-    // spawn(personnage1);
-    // spawn(personnage2);
     createLaby();
+    spawn(personnage1);
+    spawn(personnage2);
 })
 
 document.addEventListener('keydown', (e) => {
